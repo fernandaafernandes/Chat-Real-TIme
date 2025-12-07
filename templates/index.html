@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat em Tempo Real</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111827;
+            color: #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #messages {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        #messages li {
+            padding: 8px 10px;
+            border-radius: 6px;
+            max-width: 70%;
+        }
+
+        /* Mensagens do próprio usuário */
+        .me {
+            background: #4f46e5;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        /* Mensagens de outros */
+        .other {
+            background: #374151;
+            color: #f3f4f6;
+            align-self: flex-start;
+        }
+
+        #form {
+            display: flex;
+            gap: 8px;
+        }
+
+        #input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" />
+            <button>Enviar</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script>
+        const username = prompt("Digite seu nome:");
+
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('message', function(msg) {
+            var ul = document.getElementById('messages');
+            var li = document.createElement('li');
+
+            // alinha dependendo de quem enviou
+            if (msg.username === username) {
+                li.classList.add("me");
+            } else {
+                li.classList.add("other");
+            }
+
+            li.appendChild(document.createTextNode(msg.username + ": " + msg.message));
+            ul.appendChild(li);
+        });
+
+        document.getElementById('form').onsubmit = function() {
+            socket.emit('message', {
+                username: username,
+                message: document.getElementById('input').value
+            });
+            document.getElementById('input').value = '';
+            return false;
+        };
+    </script>
+</body>
+</html>
