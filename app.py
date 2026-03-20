@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'segredo'
 socketio = SocketIO(app)
 
-@app.route("/")
+@app.route("/chat")
 def index():
     return render_template("index.html")
 
@@ -16,3 +16,4 @@ def handle_message(data):
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
+py
