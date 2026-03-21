@@ -15,19 +15,17 @@ def entrar():
     return jsonify({"status": "ok", "usuarios": usuarios})
 
 
-@routes.route("/enviar", methods=["POST"])
-def enviar():
-    data = request.json
-
-    mensagem = {
-        "usuario": data.get("username"),
-        "texto": data.get("message"),
-        "hora": datetime.now().strftime("%H:%M:%S")
-    }
-
-    mensagens.append(mensagem)
-
-    return jsonify({"status": "mensagem enviada"})
+@routes.route('/enviar', methods=['POST'])
+def enviar_mensagem():
+    dados = request.get_json()
+    usuario = dados.get('username')
+    mensagem = dados.get('message')
+    
+  
+    print(f"[{usuario}] disse: {mensagem}")
+    
+    
+    return jsonify({"status": "sucesso"}), 200
 
 
 @routes.route("/mensagens", methods=["GET"])

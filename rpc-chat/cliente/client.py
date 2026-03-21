@@ -1,6 +1,6 @@
 import requests
 
-URL = "http://localhost:5000"
+URL = "http://192.168.1.12:5000"
 
 usuario = input("Digite seu nome: ")
 
