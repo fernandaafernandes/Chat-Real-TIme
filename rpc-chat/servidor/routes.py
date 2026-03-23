@@ -20,10 +20,16 @@ def enviar_mensagem():
     dados = request.get_json()
     usuario = dados.get('username')
     mensagem = dados.get('message')
+    hora = datetime.now().strftime("%H:%M:%S")
     
-  
-    print(f"[{usuario}] disse: {mensagem}")
+    # Armazenar a mensagem
+    mensagens.append({
+        "usuario": usuario,
+        "texto": mensagem,
+        "hora": hora
+    })
     
+    print(f"[{hora}] [{usuario}] disse: {mensagem}")
     
     return jsonify({"status": "sucesso"}), 200
 
