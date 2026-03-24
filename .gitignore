@@ -206,3 +206,22 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Arquivos de Setup/Instalação 
+setup.py
+
+# Ambiente Virtual 
+venv/
+.venv/
+env/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+
+# Banco de dados temporário do nosso chat
+database.json
+
+# Arquivos do Sistema
+.DS_Store
+Thumbs.db

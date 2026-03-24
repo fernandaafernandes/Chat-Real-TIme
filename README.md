@@ -1,79 +1,16 @@
-# RPC Chat - Sistema de Mensagens Distribuído
+# RPC-Chat: Sistema de Mensagens Distribuído
 
-Este projeto consiste em um sistema de chat em tempo real desenvolvido para o curso de Análise e Desenvolvimento de Sistemas (Sistemas Distribuidos). O objetivo é demonstrar a comunicação entre múltiplas máquinas virtuais (VMs) utilizando o protocolo HTTP e o conceito de RPC (Remote Procedure Call). O sistema permite que usuários enviem mensagens de clientes para um servidor central, que as armazena e exibe em tempo real.
+Este projeto implementa um chat em tempo real usando Python e Flask, com foco em conceitos de sistemas distribuídos. Inclui servidor e cliente que trocam mensagens via HTTP + JSON, com tratamento de falha de conexão e persistência temporária das mensagens.
 
-## Funcionalidades
+## 🔍 Recursos principais
 
-- **Comunicação RPC**: Utiliza chamadas de procedimento remoto via HTTP para enviar mensagens.
-- **Interface de Linha de Comando**: Cliente simples para identificação do usuário e envio de mensagens.
-- **Armazenamento Temporário**: Servidor armazena mensagens em uma lista temporária e exibe logs no terminal.
-- **Suporte a Múltiplas VMs**: Configurado para funcionar em ambiente virtualizado com IPs fixos.
-- **Logs em Tempo Real**: Mensagens são exibidas no terminal do servidor conforme chegam.
+- Comunicação cliente-servidor via REST API (HTTP/JSON)
+- Envio e visualização de mensagens em tempo real
+- Armazenamento temporário de mensagens no servidor
+- Lista de usuários conectados
+- Detecção de queda de servidor e desligamento do cliente (try/except)
 
-## Tecnologias e Ambiente
-
-- **Linguagem**: Python 3
-- **Framework**: Flask
-- **Virtualização**: Oracle VirtualBox
-- **Sistema Operacional**: Ubuntu Server 22.04 LTS
-- **Rede**: Configuração de Rede Interna (Internal Network)
-
-## Pré-requisitos
-
-- Python 3 instalado nas VMs.
-- Oracle VirtualBox para virtualização.
-- Conhecimento básico de configuração de rede em Ubuntu.
-
-## Configuração de Rede (IP Fixo)
-
-Para garantir a comunicação estável, as VMs devem ser configuradas com IPs estáticos no mesmo segmento de rede:
-
-- **VM Servidor**: 10.0.0.1
-- **VM Cliente 01**: 10.0.0.2
-- **VM Cliente 02**: 10.0.0.3
-
-A máscara de sub-rede utilizada é 255.255.255.0 (/24).
-
-### Configuração no Ubuntu
-
-Edite o arquivo de configuração do Netplan (geralmente `/etc/netplan/00-installer-config.yaml` ou similar):
-
-```yaml
-network:
-  ethernets:
-    enp0s3:
-      addresses:
-        - 10.0.0.1/24  # Para o servidor, ajuste conforme necessário
-     
-```
-
-Aplique as mudanças com `sudo netplan apply`.
-
-## Instalação e Execução
-
-### No Servidor
-
-1. Acesse a pasta do projeto: `cd /caminho/para/o/projeto`
-2. Execute o servidor: `python3 servidor/app.py`
-
-### Nos Clientes
-
-1. Acesse a pasta do projeto em cada VM cliente: `cd /caminho/para/o/projeto`
-2. Execute o cliente: `python3 cliente/client.py`
-
-### Interação
-
-- Digite seu nome de usuário quando solicitado.
-- Comece a enviar mensagens. Elas aparecerão no terminal do servidor conforme configurado no arquivo `routes.py`.
-
-## Observações de Configuração
-
-- **Firewall**: O firewall do Ubuntu deve permitir conexões na porta 5000. Execute: `sudo ufw allow 5000`
-- **Netplan**: A configuração de IP persistente deve ser feita no diretório `/etc/netplan/` para evitar perda de conexão após reiniciar a VM.
-- **Indentação**: O código Python deve seguir rigorosamente a indentação de 4 espaços para evitar erros de execução no servidor.
-- **Dependências**: Certifique-se de que o Flask está instalado: `pip install flask`
-
-## Estrutura do Projeto
+## 📁 Estrutura do projeto
 
 ```
 rpc-chat/
@@ -89,4 +26,87 @@ rpc-chat/
     └── teste_api.py
 ```
 
+## 🛠️ Tecnologias
+
+- Python 3.10+
+- Flask
+- requests
+- VirtualBox (ambiente de testes)
+- Ubuntu Server 22.04 LTS
+
+## 🌐 Configuração de rede (VirtualBox, Internal Network)
+
+Em cada VM, configure IPs estáticos (exemplo Netplan em `/etc/netplan/00-installer-config.yaml`):
+
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s3:
+      addresses:
+        - 10.0.0.1/24
+```
+
+### IPs sugeridos
+
+- Servidor primário: 10.0.0.1
+- Servidor secundário (backup): 10.0.0.10
+- Cliente 1: 10.0.0.2
+- Cliente 2: 10.0.0.3
+
+## ▶️ Executando os servidores
+
+1. No servidor primário (10.0.0.1):
+
+```bash
+cd /Users/fernandafernandes/Chat-Real-TIme/rpc-chat/servidor
+python3 app.py
+```
+
+2. No servidor secundário (10.0.0.10):
+
+```bash
+cd /Users/fernandafernandes/Chat-Real-TIme/rpc-chat/servidor
+python3 app.py
+```
+
+> O cliente deve ser configurado para tentar o IP primário (10.0.0.1) e, em caso de falha, recuar para o secundário (10.0.0.10).
+
+## ▶️ Executando o cliente
+
+```bash
+cd /Users/fernandafernandes/Chat-Real-TIme/rpc-chat/servidor
+python3 app.py
+```
+
+## ▶️ Executando o cliente
+
+```bash
+cd /Users/fernandafernandes/Chat-Real-TIme/rpc-chat/cliente
+python3 client.py
+```
+
+## 🧾 Uso do cliente (menu)
+
+1. Enviar mensagem
+2. Ver mensagens
+3. Ver usuários
+4. Sair
+
+- Ao enviar mensagem, servidor grava em `mensagens` e exibe no terminal.
+- Na opção 2, cliente exibe todas as mensagens recebidas do servidor.
+
+## ⚠️ Tratamento de exceções
+
+- Se o servidor estiver offline no login inicial, cliente exibe erro e fecha.
+- Se houver perda de conexão durante o uso, cliente informa e encerra com segurança.
+
+## 🧪 Teste rápido de fluxo
+
+1. Abra servidor
+2. Abra 2 clientes em VMs diferentes
+3. Digite usuário em cada cliente
+4. Envie mensagens (opção 1) e depois veja o histórico (opção 2)
+5. Pare o servidor para verificar o tratamento de queda do cliente
 
